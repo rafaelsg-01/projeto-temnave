@@ -69,14 +69,14 @@
     }
 
     #left-joystick {
-      bottom: 20px;
-      left: 20px;
+      bottom: 20%;
+      left: 12%;
       border: 2px solid #00ffff;
     }
 
     #right-joystick {
-      bottom: 20px;
-      right: 20px;
+      bottom: 20%;
+      right: 12%;
       border: 2px solid #ff00ff;
     }
 
@@ -103,9 +103,44 @@
         display: none !important;
       }
     }
+
+    /* Overlay de orientação */
+    #orientation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.95);
+      color: white;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    
+    #orientation-overlay i {
+      font-size: 80px;
+      margin-bottom: 20px;
+      color: #00ffff;
+    }
+    
+    #orientation-overlay p {
+      font-size: 24px;
+      color: #00ffff;
+      max-width: 80%;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
+<div id="orientation-overlay">
+  <i>↻</i>
+  <p>Por favor, gire seu dispositivo para o modo paisagem para jogar</p>
+</div>
 <canvas id="game"></canvas>
 <div id="left-joystick"></div>
 <div id="right-joystick"></div>
@@ -1646,6 +1681,30 @@ async function nextStage() {
     // Inicialmente mostra a tela inicial
     showOverlay("Tem Nave", "Jogar");
   });
+
+  // Função para verificar a orientação do dispositivo
+  function checkOrientation() {
+    const orientationOverlay = document.getElementById('orientation-overlay');
+    if (window.innerHeight > window.innerWidth) {
+      // Modo retrato (em pé)
+      orientationOverlay.style.display = 'flex';
+      overlay.style.display = 'none';
+      gameState = 'menu';
+    } else {
+      // Modo paisagem (deitado)
+      orientationOverlay.style.display = 'none';
+      if (gameState === 'menu') {
+        overlay.style.display = 'flex';
+      }
+    }
+  }
+
+  // Adicionar event listeners para mudanças de orientação
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+
+  // Verificar orientação inicial
+  checkOrientation();
 </script>
 </body>
 </html>
