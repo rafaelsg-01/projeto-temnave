@@ -16,6 +16,10 @@ Um jogo de nave espacial desenvolvido em HTML5 Canvas com JavaScript puro. Contr
 - **Joystick Direito**: Mira e atira
 - **Botão de Tela Cheia**: Ativa o modo tela cheia
 
+## 🎯 Objetivo
+
+O objetivo principal é completar o maior número de fases possível! Cada fase completada aumenta a dificuldade e a recompensa. Seu progresso é salvo automaticamente e você pode competir com jogadores de todo o mundo através do sistema de ranking global.
+
 ## 🌟 Características
 
 - 🎯 Sistema de mira e tiro preciso
@@ -36,10 +40,6 @@ Um jogo de nave espacial desenvolvido em HTML5 Canvas com JavaScript puro. Contr
 - **Recarga do Nitro**: Aumenta a velocidade de recarga
 - **Capacidade do Nitro**: Aumenta a quantidade máxima de nitro
 
-## 🎯 Objetivo
-
-Sobreviva o maior tempo possível destruindo asteroides e acumulando dinheiro para melhorar sua nave. Cada fase completada aumenta a dificuldade e a recompensa.
-
 ## 🎨 Design
 
 - Interface moderna e intuitiva
@@ -55,6 +55,8 @@ Sobreviva o maior tempo possível destruindo asteroides e acumulando dinheiro pa
 - CSS3
 - LocalStorage para salvar progresso
 - API REST para ranking global
+- Cloudflare Pages para hospedagem
+- Cloudflare Workers para API do ranking
 
 ## 📱 Compatibilidade
 
@@ -65,7 +67,7 @@ Sobreviva o maior tempo possível destruindo asteroides e acumulando dinheiro pa
 
 ## 🔗 Links
 
-- [Jogar Online](https://temnave.vercel.app)
+- [Jogar Online](https://temnave.pages.dev)
 - [Repositório GitHub](https://github.com/rafaelsg-01/projeto-temnave)
 
 ## 👨‍💻 Desenvolvido por

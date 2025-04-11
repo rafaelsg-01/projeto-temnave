@@ -679,20 +679,20 @@ document.addEventListener("mouseleave", () => shooting = false);
     x: canvas.width / 2,
     y: canvas.height / 2,
     speed: 4,
-    nitroSpeed: 10,
+    nitroSpeed: 8,
     radius: 12,
     angle: 0,
     color: "#00FFFF",
-    fireRate: 600,
-    bulletSpeed: 12,
+    fireRate: 1000,
+    bulletSpeed: 8,
     bulletSize: 6,
     lastShot: 0,
     nitroEnergy: 100,
     nitroDrain: 0.5,
-    nitroRecharge: 0.1,
+    nitroRecharge: 0.05,
     nitroCapacity: 100,
     isNitroActive: false,
-    nitroTrail: [] // Array para armazenar o rastro do nitro
+    nitroTrail: []
   };
 
   let money = parseInt(localStorage.getItem("asteroids-money")) || 0;
@@ -738,8 +738,10 @@ document.addEventListener("mouseleave", () => shooting = false);
   }
 
   function createAsteroids(count) {
-    // Ajusta a quantidade de asteroides para mobile
-    const adjustedCount = isMobile ? Math.max(1, Math.floor(count * 0.25)) : count;
+    // Ajusta a quantidade de asteroides para mobile e desktop
+    const adjustedCount = isMobile ? 
+      Math.max(1, Math.floor(count * 0.25)) : // Mantém o mobile igual
+      Math.max(1, Math.floor(count * 0.5)); // Reduz pela metade no desktop
     for (let i = 0; i < adjustedCount; i++) {
       const size = Math.random() * 70 + 50;
       spawnAsteroid(null, size);
@@ -1376,7 +1378,7 @@ async function nextStage() {
     if (money >= price) {
       money -= price;
       upgrades.fireRate++;
-      ship.fireRate = Math.max(10, 600 - (upgrades.fireRate - 1) * 55); // Aumentado o impacto
+      ship.fireRate = Math.max(200, 1000 - (upgrades.fireRate - 1) * 30); // Ajustado para progressão mais lenta
       localStorage.setItem("asteroids-money", money);
       localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
       showShop();
@@ -1388,7 +1390,7 @@ async function nextStage() {
     if (money >= price) {
       money -= price;
       upgrades.bulletSpeed++;
-      ship.bulletSpeed = 12 + (upgrades.bulletSpeed - 1) * 8;
+      ship.bulletSpeed = 8 + (upgrades.bulletSpeed - 1) * 2; // Reduzido o incremento de 8 para 2
       localStorage.setItem("asteroids-money", money);
       localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
       showShop();
@@ -1412,7 +1414,7 @@ async function nextStage() {
     if (money >= price) {
       money -= price;
       upgrades.nitroRecharge++;
-      ship.nitroRecharge = 0.1 + (upgrades.nitroRecharge - 1) * 0.2;
+      ship.nitroRecharge = 0.05 + (upgrades.nitroRecharge - 1) * 0.05; // Reduzido o incremento
       localStorage.setItem("asteroids-money", money);
       localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
       showShop();
@@ -1424,7 +1426,7 @@ async function nextStage() {
     if (money >= price) {
       money -= price;
       upgrades.nitroCapacity++;
-      ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 100;
+      ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 50; // Reduzido o incremento de 100 para 50
       ship.nitroEnergy = ship.nitroCapacity;
       localStorage.setItem("asteroids-money", money);
       localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
@@ -1444,11 +1446,11 @@ async function nextStage() {
     upgrades = savedUpgrades;
     
     // Aplicar as melhorias salvas
-    ship.fireRate = Math.max(10, 600 - (upgrades.fireRate - 1) * 55);
-    ship.bulletSpeed = 12 + (upgrades.bulletSpeed - 1) * 8;
+    ship.fireRate = Math.max(200, 1000 - (upgrades.fireRate - 1) * 30);
+    ship.bulletSpeed = 8 + (upgrades.bulletSpeed - 1) * 2;
     ship.bulletSize = 6 + (upgrades.bulletSize - 1) * 8;
-    ship.nitroRecharge = 0.1 + (upgrades.nitroRecharge - 1) * 0.2;
-    ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 100;
+    ship.nitroRecharge = 0.05 + (upgrades.nitroRecharge - 1) * 0.05;
+    ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 50;
     ship.nitroEnergy = ship.nitroCapacity;
   }
 
