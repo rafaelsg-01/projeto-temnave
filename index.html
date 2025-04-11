@@ -54,10 +54,65 @@
       transform: translateX(26px);
       background-color: #ff00ff;
     }
+
+    /* Estilos dos joysticks */
+    .joystick {
+      position: fixed;
+      width: 40%;
+      height: 40%;
+      opacity: 0.3;
+      display: none;
+    }
+
+    .joystick-base {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 255, 0.2);
+      border-radius: 50%;
+      border: 2px solid rgba(0, 255, 255, 0.5);
+    }
+
+    .joystick-knob {
+      position: absolute;
+      width: 30%;
+      height: 30%;
+      background: rgba(0, 255, 255, 0.5);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(0, 255, 255, 0.8);
+    }
+
+    #move-joystick {
+      bottom: 10%;
+      left: 10%;
+    }
+
+    #aim-joystick {
+      bottom: 10%;
+      right: 10%;
+    }
+
+    @media (max-width: 768px) {
+      .joystick {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
 <canvas id="game"></canvas>
+<!-- Adicionar os joysticks -->
+<div id="move-joystick" class="joystick">
+  <div class="joystick-base"></div>
+  <div class="joystick-knob"></div>
+</div>
+<div id="aim-joystick" class="joystick">
+  <div class="joystick-base"></div>
+  <div class="joystick-knob"></div>
+</div>
 <div id="overlay" style="
   position: fixed;
   top: 0; left: 0;
@@ -582,13 +637,144 @@ function spawnAsteroid(source, size, angleOverride = null) {
     localStorage.setItem("asteroidMode", asteroidMode);
   });
 
+  // Variáveis para os joysticks
+  let moveJoystickActive = false;
+  let aimJoystickActive = false;
+  let moveJoystickX = 0;
+  let moveJoystickY = 0;
+  let aimJoystickX = 0;
+  let aimJoystickY = 0;
+  let moveJoystickKnob;
+  let aimJoystickKnob;
+  let moveJoystickBase;
+  let aimJoystickBase;
+
+  // Inicializar os joysticks
+  function initJoysticks() {
+    moveJoystickKnob = document.querySelector('#move-joystick .joystick-knob');
+    aimJoystickKnob = document.querySelector('#aim-joystick .joystick-knob');
+    moveJoystickBase = document.querySelector('#move-joystick .joystick-base');
+    aimJoystickBase = document.querySelector('#aim-joystick .joystick-base');
+
+    // Eventos do joystick de movimento
+    moveJoystickBase.addEventListener('touchstart', handleMoveStart);
+    moveJoystickBase.addEventListener('touchmove', handleMoveMove);
+    moveJoystickBase.addEventListener('touchend', handleMoveEnd);
+
+    // Eventos do joystick de mira
+    aimJoystickBase.addEventListener('touchstart', handleAimStart);
+    aimJoystickBase.addEventListener('touchmove', handleAimMove);
+    aimJoystickBase.addEventListener('touchend', handleAimEnd);
+  }
+
+  function handleMoveStart(e) {
+    moveJoystickActive = true;
+    updateMoveJoystick(e);
+  }
+
+  function handleMoveMove(e) {
+    if (moveJoystickActive) {
+      updateMoveJoystick(e);
+    }
+  }
+
+  function handleMoveEnd() {
+    moveJoystickActive = false;
+    moveJoystickKnob.style.transform = 'translate(-50%, -50%)';
+    moveJoystickX = 0;
+    moveJoystickY = 0;
+  }
+
+  function handleAimStart(e) {
+    aimJoystickActive = true;
+    updateAimJoystick(e);
+  }
+
+  function handleAimMove(e) {
+    if (aimJoystickActive) {
+      updateAimJoystick(e);
+    }
+  }
+
+  function handleAimEnd() {
+    aimJoystickActive = false;
+    aimJoystickKnob.style.transform = 'translate(-50%, -50%)';
+    aimJoystickX = 0;
+    aimJoystickY = 0;
+  }
+
+  function updateMoveJoystick(e) {
+    const touch = e.touches[0];
+    const rect = moveJoystickBase.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const deltaX = touch.clientX - centerX;
+    const deltaY = touch.clientY - centerY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const maxDistance = rect.width / 2;
+    
+    if (distance > maxDistance) {
+      const angle = Math.atan2(deltaY, deltaX);
+      moveJoystickX = Math.cos(angle) * maxDistance;
+      moveJoystickY = Math.sin(angle) * maxDistance;
+    } else {
+      moveJoystickX = deltaX;
+      moveJoystickY = deltaY;
+    }
+    
+    moveJoystickKnob.style.transform = `translate(calc(-50% + ${moveJoystickX}px), calc(-50% + ${moveJoystickY}px))`;
+  }
+
+  function updateAimJoystick(e) {
+    const touch = e.touches[0];
+    const rect = aimJoystickBase.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const deltaX = touch.clientX - centerX;
+    const deltaY = touch.clientY - centerY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const maxDistance = rect.width / 2;
+    
+    if (distance > maxDistance) {
+      const angle = Math.atan2(deltaY, deltaX);
+      aimJoystickX = Math.cos(angle) * maxDistance;
+      aimJoystickY = Math.sin(angle) * maxDistance;
+    } else {
+      aimJoystickX = deltaX;
+      aimJoystickY = deltaY;
+    }
+    
+    aimJoystickKnob.style.transform = `translate(calc(-50% + ${aimJoystickX}px), calc(-50% + ${aimJoystickY}px))`;
+    
+    // Atualizar a mira
+    mouseX = ship.x + aimJoystickX * 2;
+    mouseY = ship.y + aimJoystickY * 2;
+    
+    // Atirar automaticamente quando o joystick de mira estiver ativo
+    if (!shooting) {
+      shooting = true;
+    }
+  }
+
+  // Modificar a função update para usar os joysticks
   async function update() {
     if (gameState !== "playing") return;
+    
     let dx = 0, dy = 0;
+    
+    // Usar teclado ou joystick de movimento
     if (keys["w"]) dy = -1;
     if (keys["s"]) dy = 1;
     if (keys["a"]) dx = -1;
     if (keys["d"]) dx = 1;
+    
+    if (moveJoystickActive) {
+      const maxDistance = moveJoystickBase.getBoundingClientRect().width / 2;
+      dx = moveJoystickX / maxDistance;
+      dy = moveJoystickY / maxDistance;
+    }
 
     // Sistema de nitro
     if (keys["shift"] && ship.nitroEnergy > 0) {
@@ -1468,6 +1654,7 @@ async function nextStage() {
     
     // Inicialmente mostra a tela inicial
     showOverlay("Tem Nave", "Jogar");
+    initJoysticks();
   });
 </script>
 </body>
