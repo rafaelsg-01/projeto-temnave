@@ -392,42 +392,54 @@
 
     // Controle de movimento
     leftJoystick.on('move', (evt, data) => {
-      const angle = data.angle.radian;
-      const force = data.force;
-      
-      // Resetar todas as teclas
-      keys['w'] = false;
-      keys['a'] = false;
-      keys['s'] = false;
-      keys['d'] = false;
+  const angle = data.angle.radian;
+  const force = data.force;
 
-      // Determinar direção baseado no ângulo
-      if (force > 0.1) {
-        // Normaliza o ângulo para 0-2π
-        let normalizedAngle = angle;
-        if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
-        
-        // Define os quadrantes e direções
-        const up = normalizedAngle > 7*Math.PI/4 || normalizedAngle <= Math.PI/4;
-        const right = normalizedAngle > Math.PI/4 && normalizedAngle <= 3*Math.PI/4;
-        const down = normalizedAngle > 3*Math.PI/4 && normalizedAngle <= 5*Math.PI/4;
-        const left = normalizedAngle > 5*Math.PI/4 && normalizedAngle <= 7*Math.PI/4;
+  // Resetar todas as teclas
+  keys['w'] = false;
+  keys['a'] = false;
+  keys['s'] = false;
+  keys['d'] = false;
 
-        // Determina as direções (invertidas)
-        if (up) {
-          keys['d'] = true; // Cima do joystick = Direita da nave
-        }
-        if (right) {
-          keys['w'] = true; // Direita do joystick = Cima da nave
-        }
-        if (down) {
-          keys['a'] = true; // Baixo do joystick = Esquerda da nave
-        }
-        if (left) {
-          keys['s'] = true; // Esquerda do joystick = Baixo da nave
-        }
-      }
-    });
+  if (force > 0.1) {
+    // Normaliza o ângulo para 0 - 2π
+    let normalizedAngle = angle;
+    if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+
+    // Dividindo o círculo em 8 fatias de 45 graus
+    // Cada fatia: 22.5° para cada lado do eixo principal
+    if (normalizedAngle >= 15 * Math.PI / 8 || normalizedAngle < Math.PI / 8) {
+      // Direita (0°)
+      keys['d'] = true;
+    } else if (normalizedAngle >= Math.PI / 8 && normalizedAngle < 3 * Math.PI / 8) {
+      // Cima-direita (45°)
+      keys['d'] = true;
+      keys['w'] = true;
+    } else if (normalizedAngle >= 3 * Math.PI / 8 && normalizedAngle < 5 * Math.PI / 8) {
+      // Cima (90°)
+      keys['w'] = true;
+    } else if (normalizedAngle >= 5 * Math.PI / 8 && normalizedAngle < 7 * Math.PI / 8) {
+      // Cima-esquerda (135°)
+      keys['w'] = true;
+      keys['a'] = true;
+    } else if (normalizedAngle >= 7 * Math.PI / 8 && normalizedAngle < 9 * Math.PI / 8) {
+      // Esquerda (180°)
+      keys['a'] = true;
+    } else if (normalizedAngle >= 9 * Math.PI / 8 && normalizedAngle < 11 * Math.PI / 8) {
+      // Baixo-esquerda (225°)
+      keys['a'] = true;
+      keys['s'] = true;
+    } else if (normalizedAngle >= 11 * Math.PI / 8 && normalizedAngle < 13 * Math.PI / 8) {
+      // Baixo (270°)
+      keys['s'] = true;
+    } else if (normalizedAngle >= 13 * Math.PI / 8 && normalizedAngle < 15 * Math.PI / 8) {
+      // Baixo-direita (315°)
+      keys['s'] = true;
+      keys['d'] = true;
+    }
+  }
+});
+
 
     leftJoystick.on('end', () => {
       keys['w'] = false;
