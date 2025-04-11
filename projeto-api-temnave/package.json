@@ -1,0 +1,23 @@
+{
+	"name": "intranet-api-work",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy src/index.ts",
+		"dev": "wrangler dev --env local --persist-to=%USERPROFILE%\\Documents\\c\\Projeto_WikiRip\\wikirip-database\\.wrangler\\state",
+		"start": "wrangler dev",
+		"test": "vitest --silent=false --reporter=basic --disableConsoleIntercept"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20240605.0",
+		"@types/jest": "^29.5.12",
+		"jest": "^29.7.0",
+		"jsdom": "^24.1.0",
+		"typescript": "^5.4.5",
+		"vitest": "^1.6.0",
+		"wrangler": "^3.61.0"
+	},
+	"dependencies": {
+		"@tsndr/cloudflare-worker-jwt": "^2.5.3"
+	}
+}

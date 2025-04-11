@@ -1,0 +1,12 @@
+
+name = "temnave-api-work"
+main = "./src/index.ts"
+compatibility_date = "2024-06-19"
+
+
+
+# D1 Database Production
+[[d1_databases]]
+binding = "D1_temnaveWorkers"
+database_name = "temnave_workers-production"
+database_id = "54a905b8-b1c5-4f28-b680-2258b7b29549"
