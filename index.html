@@ -55,44 +55,60 @@
       transform: translateX(26px);
       background-color: #ff00ff;
     }
-  </style>
-  <style>
+
     /* Estilos para os joysticks */
-    .joystick-container {
+    #left-joystick, #right-joystick {
       position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 5;
-      display: none;
+      width: 150px;
+      height: 150px;
+      z-index: 100;
+      opacity: 0.5;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
+      pointer-events: auto;
     }
-    
+
     #left-joystick {
-      position: absolute;
-      left: 20%;
-      bottom: 20%;
-      width: 120px;
-      height: 120px;
+      bottom: 20px;
+      left: 20px;
+      border: 2px solid #00ffff;
     }
-    
+
     #right-joystick {
-      position: absolute;
-      right: 20%;
-      bottom: 20%;
-      width: 120px;
-      height: 120px;
+      bottom: 20px;
+      right: 20px;
+      border: 2px solid #ff00ff;
     }
-    
-    .joystick-container.active {
-      display: block;
+
+    @media (max-width: 768px), (hover: none) {
+      #left-joystick, #right-joystick {
+        display: block !important;
+      }
+      #tutorial {
+        display: none !important;
+      }
+      #overlay > div > div:first-child {
+        display: none !important;
+      }
+      canvas {
+        transform: scale(0.5);
+        transform-origin: top left;
+        width: 200% !important;
+        height: 200% !important;
+      }
+    }
+
+    @media (min-width: 769px) and (hover: hover) {
+      #left-joystick, #right-joystick {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<div class="joystick-container" id="joystick-container">
-  <div id="left-joystick"></div>
-  <div id="right-joystick"></div>
-</div>
+<div id="left-joystick"></div>
+<div id="right-joystick"></div>
 <div id="overlay" style="
   position: fixed;
   top: 0; left: 0;
@@ -335,122 +351,114 @@
   const overlayTitle = document.getElementById("overlay-title");
   const overlayButton = document.getElementById("overlay-button");
 
-  // Detecção de dispositivo móvel
+  // Modo debug - coloque true para ativar o modo invencível
+  const godMode = false;
+  if (godMode) {
+    console.log('Modo Deus ativado! Você é invencível!');
+  }
+
+  // Verifica se é um dispositivo móvel
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const joystickContainer = document.getElementById("joystick-container");
+  console.log('Detecção de dispositivo:', {
+    userAgent: navigator.userAgent,
+    isMobile: isMobile,
+    screenWidth: window.innerWidth,
+    touchEnabled: 'ontouchstart' in window
+  });
 
-  // Inicialização dos joysticks se for dispositivo móvel
-  if (isMobile) {
-    joystickContainer.classList.add("active");
-    
-    // Joystick esquerdo para movimento
+  // Inicializa os joysticks se for dispositivo móvel
+  if (isMobile || 'ontouchstart' in window) {
+    console.log('Inicializando joysticks...');
     const leftJoystick = nipplejs.create({
-      zone: document.getElementById("left-joystick"),
-      mode: "static",
-      position: { left: "50%", top: "50%" },
-      color: "rgba(0, 255, 255, 0.5)",
+      zone: document.getElementById('left-joystick'),
+      mode: 'static',
+      position: { left: '50%', top: '50%' },
+      color: '#00ffff',
       size: 120
     });
 
-    // Joystick direito para mira e tiro
     const rightJoystick = nipplejs.create({
-      zone: document.getElementById("right-joystick"),
-      mode: "static",
-      position: { left: "50%", top: "50%" },
-      color: "rgba(255, 0, 0, 0.5)",
+      zone: document.getElementById('right-joystick'),
+      mode: 'static',
+      position: { left: '50%', top: '50%' },
+      color: '#ff00ff',
       size: 120
     });
 
-    // Controle do movimento
-    leftJoystick.on("move", (evt, data) => {
+    console.log('Joysticks criados:', {
+      left: leftJoystick,
+      right: rightJoystick
+    });
+
+    // Controle de movimento
+    leftJoystick.on('move', (evt, data) => {
       const angle = data.angle.radian;
       const force = data.force;
       
-      // Resetar todas as teclas de movimento
-      keys["w"] = false;
-      keys["a"] = false;
-      keys["s"] = false;
-      keys["d"] = false;
-      
+      // Resetar todas as teclas
+      keys['w'] = false;
+      keys['a'] = false;
+      keys['s'] = false;
+      keys['d'] = false;
+
       // Determinar direção baseado no ângulo
       if (force > 0.1) {
-        if (angle >= -Math.PI/4 && angle < Math.PI/4) {
-          keys["d"] = true; // Direita
-        } else if (angle >= Math.PI/4 && angle < 3*Math.PI/4) {
-          keys["s"] = true; // Baixo
-        } else if (angle >= 3*Math.PI/4 || angle < -3*Math.PI/4) {
-          keys["a"] = true; // Esquerda
-        } else if (angle >= -3*Math.PI/4 && angle < -Math.PI/4) {
-          keys["w"] = true; // Cima
-        }
+        // Normaliza o ângulo para 0-2π
+        let normalizedAngle = angle;
+        if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
         
-        // Diagonais
-        if (angle >= -Math.PI/8 && angle < Math.PI/8) {
-          keys["d"] = true;
-        } else if (angle >= Math.PI/8 && angle < 3*Math.PI/8) {
-          keys["d"] = true;
-          keys["s"] = true;
-        } else if (angle >= 3*Math.PI/8 && angle < 5*Math.PI/8) {
-          keys["s"] = true;
-        } else if (angle >= 5*Math.PI/8 && angle < 7*Math.PI/8) {
-          keys["s"] = true;
-          keys["a"] = true;
-        } else if (angle >= 7*Math.PI/8 || angle < -7*Math.PI/8) {
-          keys["a"] = true;
-        } else if (angle >= -7*Math.PI/8 && angle < -5*Math.PI/8) {
-          keys["a"] = true;
-          keys["w"] = true;
-        } else if (angle >= -5*Math.PI/8 && angle < -3*Math.PI/8) {
-          keys["w"] = true;
-        } else if (angle >= -3*Math.PI/8 && angle < -Math.PI/8) {
-          keys["w"] = true;
-          keys["d"] = true;
+        // Define os quadrantes e direções
+        const up = normalizedAngle > 7*Math.PI/4 || normalizedAngle <= Math.PI/4;
+        const right = normalizedAngle > Math.PI/4 && normalizedAngle <= 3*Math.PI/4;
+        const down = normalizedAngle > 3*Math.PI/4 && normalizedAngle <= 5*Math.PI/4;
+        const left = normalizedAngle > 5*Math.PI/4 && normalizedAngle <= 7*Math.PI/4;
+
+        // Determina as direções (invertidas)
+        if (up) {
+          keys['d'] = true; // Cima do joystick = Direita da nave
+        }
+        if (right) {
+          keys['w'] = true; // Direita do joystick = Cima da nave
+        }
+        if (down) {
+          keys['a'] = true; // Baixo do joystick = Esquerda da nave
+        }
+        if (left) {
+          keys['s'] = true; // Esquerda do joystick = Baixo da nave
         }
       }
     });
 
-    leftJoystick.on("end", () => {
-      keys["w"] = false;
-      keys["a"] = false;
-      keys["s"] = false;
-      keys["d"] = false;
+    leftJoystick.on('end', () => {
+      keys['w'] = false;
+      keys['a'] = false;
+      keys['s'] = false;
+      keys['d'] = false;
     });
 
-    // Controle da mira e tiro
-    rightJoystick.on("move", (evt, data) => {
+    // Controle de mira e tiro
+    rightJoystick.on('move', (evt, data) => {
       const angle = data.angle.radian;
       const force = data.force;
       
       if (force > 0.1) {
-        // Atualizar posição do mouse para mira
-        const rect = canvas.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const distance = 100; // Distância da mira
+        // Inverte o ângulo para corrigir a direção da rotação
+        const invertedAngle = -angle;
         
-        mouseX = centerX + Math.cos(angle) * distance;
-        mouseY = centerY + Math.sin(angle) * distance;
+        // Calcula a posição do mouse baseada na posição da nave
+        const distance = 200; // Distância fixa para a mira
+        mouseX = ship.x + Math.cos(invertedAngle) * distance;
+        mouseY = ship.y + Math.sin(invertedAngle) * distance;
         
-        // Atirar continuamente
+        // Ativa o tiro
         shooting = true;
       } else {
         shooting = false;
       }
     });
 
-    rightJoystick.on("end", () => {
+    rightJoystick.on('end', () => {
       shooting = false;
-    });
-
-    // Forçar tela cheia em dispositivos móveis
-    document.addEventListener("click", () => {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-      } else if (document.documentElement.msRequestFullscreen) {
-        document.documentElement.msRequestFullscreen();
-      }
     });
   }
 
@@ -653,7 +661,9 @@ document.addEventListener("mouseleave", () => shooting = false);
   }
 
   function createAsteroids(count) {
-    for (let i = 0; i < count; i++) {
+    // Ajusta a quantidade de asteroides para mobile
+    const adjustedCount = isMobile ? Math.max(1, Math.floor(count * 0.25)) : count;
+    for (let i = 0; i < adjustedCount; i++) {
       const size = Math.random() * 70 + 50;
       spawnAsteroid(null, size);
     }
@@ -868,7 +878,7 @@ function spawnAsteroid(source, size, angleOverride = null) {
 
       const dx2 = a.x - ship.x;
       const dy2 = a.y - ship.y;
-      if (Math.sqrt(dx2 * dx2 + dy2 * dy2) < a.size + ship.radius) {
+      if (!godMode && Math.sqrt(dx2 * dx2 + dy2 * dy2) < a.size + ship.radius) {
         gameState = "gameover";
         gameOverSound.currentTime = 0;
         gameOverSound.play();
