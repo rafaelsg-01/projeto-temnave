@@ -69,14 +69,14 @@
     }
 
     #left-joystick {
-      bottom: 20%;
-      left: 12%;
+      bottom: 8.8%;
+      left: 4.7%;
       border: 2px solid #00ffff;
     }
 
     #right-joystick {
-      bottom: 20%;
-      right: 12%;
+      bottom: 8.8%;
+      right: 4.7%;
       border: 2px solid #ff00ff;
     }
 
@@ -248,6 +248,21 @@
       overflow-y: auto;
       position: relative;
     ">
+      <!-- Botão de tela cheia -->
+      <button id="fullscreen-button" style="
+        position: absolute;
+        top: -8px;
+        left: 0px;
+        background: none;
+        border: none;
+        color: #00ffff;
+        font-size: 36px;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        transition: all 0.3s;
+      " title="Tela cheia">⛶</button>
+
       <!-- Switch de modos -->
       <div style="
         position: absolute;
@@ -1426,6 +1441,18 @@ async function nextStage() {
   loadUpgrades();
   createAsteroids(wave + 4);
   loop();
+
+  // Adicionar event listener para o botão de tela cheia
+  const fullscreenButton = document.getElementById("fullscreen-button");
+  fullscreenButton.addEventListener("click", () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    }
+  });
 
   const shopButton = document.getElementById("shop-button");
   shopButton.addEventListener("click", showShop);
