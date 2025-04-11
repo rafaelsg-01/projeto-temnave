@@ -76,4 +76,91 @@ O objetivo principal é completar o maior número de fases possível! Cada fase 
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes. 
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 🧠 Lógica do Jogo
+
+### Sistema de Progressão
+- **Fases**: O jogo é dividido em fases, cada uma mais desafiadora que a anterior
+- **Asteroides**: A quantidade de asteroides aumenta com a fase atual (wave + 4)
+- **Recompensas**: A recompensa por fase aumenta exponencialmente (50% a cada fase)
+- **Dificuldade**: A velocidade dos asteroides aumenta gradualmente com a fase
+
+### Mecânicas de Jogabilidade
+- **Movimentação**: 
+  - Velocidade base: 4 unidades/quadro
+  - Nitro: Aumenta para 8 unidades/quadro
+  - Controles suaves e responsivos
+
+- **Sistema de Tiro**:
+  - Cadência inicial: 1000ms (1 tiro por segundo)
+  - Velocidade inicial: 8 unidades/quadro
+  - Tamanho inicial: 6 pixels
+  - Mira precisa com o mouse/joystick
+
+- **Nitro**:
+  - Capacidade inicial: 100 unidades
+  - Dreno: 0.5 unidades/quadro
+  - Recarga: 0.05 unidades/quadro
+  - Efeito visual de rastro
+
+### Sistema de Melhorias
+- **Progressão Gradual**:
+  - Cadência: Diminui 30ms por nível (mínimo 200ms)
+  - Velocidade: Aumenta 2 unidades por nível
+  - Tamanho: Aumenta 8 pixels por nível
+  - Nitro: Capacidade aumenta 50 unidades por nível
+  - Recarga: Aumenta 0.05 unidades por nível
+
+- **Preços**:
+  - Aumentam exponencialmente após o nível 10
+  - Baseados em uma tabela de preços inicial
+  - Multiplicador de 2x a cada nível após o 10
+
+### Balanceamento
+- **Mobile vs Desktop**:
+  - Mobile: 25% dos asteroides do desktop
+  - Desktop: 50% dos asteroides originais
+  - Interface adaptativa
+
+- **Modos de Jogo**:
+  - Teletransporte: Asteroides reaparecem do lado oposto
+  - Quicado: Asteroides ricocheteiam nas bordas
+
+### Sistema de Pontuação
+- **Recompensas por Asteroide**:
+  - Base: Tamanho do asteroide / 5
+  - Multiplicador de fase: 1 + (fase * 0.2)
+  - Bônus de melhorias: 1 + (total de níveis * 0.1)
+
+- **Ranking Global**:
+  - Baseado no nível máximo alcançado
+  - Atualizado em tempo real
+  - Persistente entre sessões
+
+### Otimizações
+- **Performance**:
+  - Canvas otimizado para renderização
+  - Sistema de partículas eficiente
+  - Gerenciamento de memória com limpeza de objetos
+
+- **Persistência**:
+  - Dados salvos localmente
+  - Progresso mantido entre sessões
+  - Sincronização com ranking global
+
+### Detalhes Técnicos
+- **API**:
+  - Endpoint: `https://temnave-api-work.projetobot.workers.dev`
+  - Métodos: POST para scores, GET para ranking
+  - Resposta em JSON
+
+- **Armazenamento**:
+  - LocalStorage para dados do jogador
+  - Cookies para preferências
+  - Cache para assets
+
+- **Segurança**:
+  - IDs únicos para jogadores
+  - Validação de dados
+  - Proteção contra manipulação 
