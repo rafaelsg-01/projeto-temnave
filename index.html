@@ -1,12 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Asteroids Power Visuals</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tem Nave</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; }
     canvas { display: block; background: black; cursor: crosshair; }
+    /* Estilo do switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #006666;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: #00ffff;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #660066;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+      background-color: #ff00ff;
+    }
   </style>
 </head>
 <body>
@@ -16,38 +63,258 @@
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.9);
   color: white;
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   z-index: 10;
   font-family: sans-serif;
 ">
-  <h1 id="overlay-title"></h1>
+  <div style="
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    gap: 20px;
+    margin: auto;
+  ">
+    <!-- Tutorial -->
+    <div style="
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 30px rgba(0,255,255,0.3);
+      width: 300px;
+      height: fit-content;
+      margin: auto;
+      max-height: 90vh;
+      overflow-y: auto;
+    ">
+      <h2 style="color: #00ffff; margin-bottom: 20px; text-align: center;">Controles</h2>
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div style="
+            background: rgba(0,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: monospace;
+          ">W-A-S-D</div>
+          <span>Movimenta a nave</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div style="
+            background: rgba(0,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: monospace;
+          ">Mouse</div>
+          <span>Mira e Atira</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div style="
+            background: rgba(0,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: monospace;
+          ">Shift</div>
+          <span>Nitro</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <div style="
+            background: rgba(0,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: monospace;
+          ">Ctrl + Scroll</div>
+          <span>Tamanho do mapa</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <div style="
+            background: rgba(0,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: monospace;
+          ">F11</div>
+          <span>Tela cheia</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div style="
+      background: rgba(0,0,0,0.8);
+      padding: 40px;
+      border-radius: 20px;
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 30px rgba(0,255,255,0.3);
+      text-align: center;
+      flex: 1;
+      height: fit-content;
+      margin: auto;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    ">
+      <!-- Switch de modos -->
+      <div style="
+        position: absolute;
+        top: 8px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      ">
+        <span style="color: #00ffff;">Teletransporte</span>
+        <label class="switch">
+          <input type="checkbox" id="modeSwitch">
+          <span class="slider"></span>
+        </label>
+        <span style="color: #00ffff;">Quicado</span>
+      </div>
+
+      <h1 id="overlay-title" style="
+        color: #00ffff;
+        font-size: 48px;
+        margin-bottom: 30px;
+        text-shadow: 0 0 10px rgba(0,255,255,0.5);
+      ">Tem Nave</h1>
   <button id="overlay-button" style="
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-size: 18px;
-    background: #00ffff;
-    color: #000;
-    border: none;
-    border-radius: 8px;
+        margin: 10px 0;
+        padding: 15px 30px;
+        font-size: 20px;
+        background: #006666;
+        color: #e6ffff;
+        border: 2px solid #00ffff;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+      ">Jogar</button>
+      <button id="shop-button" style="
+        margin: 10px 0;
+        padding: 15px 30px;
+        font-size: 20px;
+        background: #660066;
+        color: #ffdbff;
+        border: 2px solid #ff00ff;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+      ">Loja</button>
+
+      <!-- Controle de Volume -->
+      <div style="
+        margin: 10px 0;
+        padding: 15px;
+        background: rgba(0,0,0,0.5);
+        border: 1px solid #00ffff;
+        border-radius: 10px;
+        text-align: center;
+      ">
+        <div style="
+          color: #00ffff;
+          margin-bottom: 10px;
+          font-size: 16px;
+        ">Volume</div>
+        <input type="range" id="volumeControl" min="0" max="100" value="70" style="
+          width: 100%;
+          height: 10px;
+          -webkit-appearance: none;
+          background: rgba(0,255,255,0.2);
+          border-radius: 5px;
+          outline: none;
+        ">
+        <div id="volumeValue" style="
+          color: #00ffff;
+          margin-top: 5px;
+          font-size: 14px;
+        ">70%</div>
+      </div>
+    </div>
+
+    <!-- Ranking -->
+    <div style="
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 30px rgba(0,255,255,0.3);
+      width: 300px;
+      height: fit-content;
+      margin: auto;
+      max-height: 90vh;
+      overflow-y: auto;
+    ">
+      <h2 style="color: #00ffff; margin-bottom: 20px; text-align: center;">Ranking</h2>
+      
+      <!-- Input do nick -->
+      <div style="margin-bottom: 20px;">
+        <div style="color: #00ffff; margin-bottom: 10px; text-align: center;">Digite seu nick</div>
+        <input type="text" id="playerNick" style="
+          width: 100%;
+          padding: 10px;
+          background: rgba(0,255,255,0.1);
+          border: 1px solid #00ffff;
+          border-radius: 5px;
+          color: white;
+          font-size: 16px;
+          margin-bottom: 10px;
+        " placeholder="Seu nick aqui" maxlength="14">
+        <button onclick="saveNick()" style="
+          width: 100%;
+          padding: 10px;
+          background: #006666;
+          color: #00ffff;
+          border: 1px solid #00ffff;
+          border-radius: 5px;
     cursor: pointer;
-  ">Continuar</button>
+          transition: all 0.3s;
+        ">Salvar</button>
+      </div>
+
+      <!-- Lista de ranking -->
+      <div id="rankingList" style="
+        max-height: calc(90vh - 230px);
+        overflow-y: auto;
+        padding-right: 10px;
+      ">
+        <!-- O ranking será preenchido via JavaScript -->
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
-  let gameState = "playing"; // valores: "playing", "gameover", "stagecomplete"
+  let gameState = "playing"; // valores: "playing", "gameover", "stagecomplete", "shop"
   const overlay = document.getElementById("overlay");
   const overlayTitle = document.getElementById("overlay-title");
   const overlayButton = document.getElementById("overlay-button");
   overlayButton.addEventListener("click", () => {
-    overlay.style.display = "none";
-    if (gameState === "gameover") {
+    if (gameState === "menu") {
+      // Ativa tela cheia apenas quando clicar em "Jogar" no menu inicial
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+      }
+      
+      overlay.style.display = "none";
+      gameState = "playing";
+      loadUpgrades();
+      createAsteroids(wave + 4);
+    } else if (gameState === "gameover") {
       retryStage();
     } else if (gameState === "stagecomplete") {
       nextStage();
@@ -58,12 +325,51 @@
   let currentStage = parseInt(localStorage.getItem("asteroids-stage")) || 1;
 
 
+  const stars = [];
+  function createStars() {
+    stars.length = 0; // Limpa o array de estrelas
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        baseX: Math.random() * canvas.width,
+        baseY: Math.random() * canvas.height,
+        offset: Math.random() * 100,
+        size: Math.random() * 2 + 1,
+        twinkle: Math.random() * 2 + 0.5,
+        moveSpeed: Math.random() * 0.3 + 0.1
+      });
+    }
+  }
+
+  function drawStars() {
+    const time = Date.now() * 0.001;
+
+    stars.forEach(s => {
+      const x = s.baseX + Math.sin(time * s.moveSpeed + s.offset) * 10;
+      const y = s.baseY + Math.cos(time * s.moveSpeed + s.offset) * 10;
+
+      const pulse = 0.6 + Math.sin(time * s.twinkle) * 0.4;
+      const outerRadius = s.size * 1;
+
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, outerRadius);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${pulse})`);
+      grad.addColorStop(0.2, `rgba(255, 255, 255, ${pulse * 0.5})`);
+      grad.addColorStop(1, `rgba(255, 255, 255, 0)`);
+
+      ctx.beginPath();
+      ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    });
+  }
+
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    createStars();
   }
+
   window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+  resizeCanvas(); // Primeira chamada para criar as estrelas
 
   const keys = {};
   let mouseX = 0;
@@ -80,11 +386,7 @@
   });
 
   document.addEventListener("mousedown", () => {
-  if (gameState === "gameover") {
-    retryStage();
-  } else if (gameState === "stagecomplete") {
-    nextStage();
-  } else {
+    if (gameState === "playing") {
     shooting = true;
   }
 });
@@ -92,6 +394,7 @@
 document.addEventListener("mouseup", () => {
   shooting = false;
 });
+
 document.addEventListener("mouseleave", () => shooting = false);
 
 
@@ -100,32 +403,89 @@ document.addEventListener("mouseleave", () => shooting = false);
   shootSound.volume = 0.3;
 
   const explosionSound = new Audio("./explosion.wav");
+  const gameOverSound = new Audio("./game_over.wav");
+
+  // Controle de Volume
+  const volumeControl = document.getElementById("volumeControl");
+  const volumeValue = document.getElementById("volumeValue");
+
+  // Carregar volume salvo
+  const savedVolume = localStorage.getItem("gameVolume");
+  if (savedVolume !== null) {
+    const volume = parseFloat(savedVolume);
+    volumeControl.value = volume * 100;
+    volumeValue.textContent = `${Math.round(volume * 100)}%`;
+    updateVolume(volume);
+  } else {
+    // Se não houver volume salvo, define como 70%
+    updateVolume(70);
+  }
+
+  // Atualizar volume
+  function updateVolume(value) {
+    const volume = value / 100;
+    shootSound.volume = volume * 0.3;
+    explosionSound.volume = volume;
+    gameOverSound.volume = volume;
+    volumeValue.textContent = `${Math.round(value)}%`;
+    localStorage.setItem("gameVolume", volume.toString());
+  }
+
+  volumeControl.addEventListener("input", (e) => {
+    updateVolume(e.target.value);
+  });
 
   const ship = {
     x: canvas.width / 2,
     y: canvas.height / 2,
-    speed: 3,
+    speed: 4,
+    nitroSpeed: 10,
     radius: 12,
     angle: 0,
-    color: "#00FFFF"
+    color: "#00FFFF",
+    fireRate: 600,
+    bulletSpeed: 12,
+    bulletSize: 6,
+    lastShot: 0,
+    nitroEnergy: 100,
+    nitroDrain: 0.5,
+    nitroRecharge: 0.1,
+    nitroCapacity: 100,
+    isNitroActive: false,
+    nitroTrail: [] // Array para armazenar o rastro do nitro
   };
+
+  let money = parseInt(localStorage.getItem("asteroids-money")) || 0;
+  let upgrades = JSON.parse(localStorage.getItem("asteroids-upgrades")) || {
+    fireRate: 1,
+    bulletSpeed: 1,
+    bulletSize: 1,
+    nitroRecharge: 1,
+    nitroCapacity: 1
+  };
+
+  const upgradePrices = {
+    fireRate: [100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000],
+    bulletSpeed: [150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 76800],
+    bulletSize: [200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400],
+    nitroRecharge: [300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 76800, 153600],
+    nitroCapacity: [400, 800, 1600, 3200, 6400, 12800, 25600, 51200, 102400, 204800]
+  };
+
+  function calculateUpgradePrice(basePrices, currentLevel) {
+    if (currentLevel <= 10) {
+      return basePrices[currentLevel - 1];
+    }
+    // Após o nível 10, o preço aumenta exponencialmente
+    const lastPrice = basePrices[basePrices.length - 1];
+    const multiplier = Math.pow(2, currentLevel - 10);
+    return Math.floor(lastPrice * multiplier);
+  }
 
   const bullets = [];
   let asteroids = [];
   let particles = [];
   let wave = 1;
-
-  const stars = [];
-  for (let i = 0; i < 200; i++) {
-    stars.push({
-      baseX: Math.random() * canvas.width,
-      baseY: Math.random() * canvas.height,
-      offset: Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      twinkle: Math.random() * 2 + 0.5,
-      moveSpeed: Math.random() * 0.3 + 0.1
-    });
-  }
 
   function HSLToRGB(h, s, l) {
     s /= 100;
@@ -138,10 +498,18 @@ document.addEventListener("mouseleave", () => shooting = false);
   }
 
   function createAsteroids(count) {
-  for (let i = 0; i < count; i++) {
-    const size = Math.random() * 70 + 50; // 50 a 120
-    spawnAsteroid(null, size);
+    for (let i = 0; i < count; i++) {
+      const size = Math.random() * 70 + 50;
+      spawnAsteroid(null, size);
+    }
   }
+
+  // Função para calcular a recompensa baseada no nível
+  function calculateReward(size, wave) {
+    const baseReward = Math.floor(size / 5);
+    const waveMultiplier = 1 + (wave * 0.2);
+    const upgradeBonus = 1 + (Object.values(upgrades).reduce((a, b) => a + b, 0) * 0.1);
+    return Math.floor(baseReward * waveMultiplier * upgradeBonus);
 }
 
 function spawnAsteroid(source, size, angleOverride = null) {
@@ -162,10 +530,9 @@ function spawnAsteroid(source, size, angleOverride = null) {
   const baseSpeed = Math.random() * 3 + 0.5 + Math.random() * wave * 0.2;
   const speed = source ? baseSpeed + 2 : baseSpeed;
   const hue = Math.random() * 360;
-  asteroids.push({ x, y, size, angle, speed, hue });
+    const reward = calculateReward(size, wave);
+    asteroids.push({ x, y, size, angle, speed, hue, reward });
 }
-
-
 
   function shoot() {
     const dx = mouseX - ship.x;
@@ -175,9 +542,9 @@ function spawnAsteroid(source, size, angleOverride = null) {
       x: ship.x,
       y: ship.y,
       angle,
-      speed: 18,
+      speed: ship.bulletSpeed,
       length: 20,
-      width: 6
+      width: ship.bulletSize
     });
     shootSound.currentTime = 0;
     shootSound.play();
@@ -187,7 +554,7 @@ function spawnAsteroid(source, size, angleOverride = null) {
     explosionSound.currentTime = 0;
     explosionSound.play();
 
-    const particleCount = Math.min(60, Math.floor(size * 0.6));
+    const particleCount = Math.min(30, Math.floor(size * 0.3));
     const [r, g, b] = HSLToRGB(hue, 100, 60);
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -202,7 +569,20 @@ function spawnAsteroid(source, size, angleOverride = null) {
     }
   }
 
-  function update() {
+  // Adicionar após as declarações iniciais
+  let asteroidMode = localStorage.getItem("asteroidMode") || "Teletransporte";
+  const modeSwitch = document.getElementById("modeSwitch");
+
+  // Configurar o switch baseado no modo salvo
+  modeSwitch.checked = asteroidMode === "Quicado";
+
+  // Evento de mudança do switch
+  modeSwitch.addEventListener("change", () => {
+    asteroidMode = modeSwitch.checked ? "Quicado" : "Teletransporte";
+    localStorage.setItem("asteroidMode", asteroidMode);
+  });
+
+  async function update() {
     if (gameState !== "playing") return;
     let dx = 0, dy = 0;
     if (keys["w"]) dy = -1;
@@ -210,10 +590,37 @@ function spawnAsteroid(source, size, angleOverride = null) {
     if (keys["a"]) dx = -1;
     if (keys["d"]) dx = 1;
 
+    // Sistema de nitro
+    if (keys["shift"] && ship.nitroEnergy > 0) {
+      ship.isNitroActive = true;
+      ship.nitroEnergy = Math.max(0, ship.nitroEnergy - ship.nitroDrain);
+      
+      // Adicionar partícula ao rastro
+      if (Math.random() < 0.3) {
+        ship.nitroTrail.push({
+          distance: Math.random() * 30 + 20,
+          size: Math.random() * 10 + 5,
+          opacity: Math.random() * 0.5 + 0.5
+        });
+      }
+    } else {
+      ship.isNitroActive = false;
+      ship.nitroEnergy = Math.min(100, ship.nitroEnergy + ship.nitroRecharge);
+    }
+
+    // Atualizar rastro do nitro
+    for (let i = ship.nitroTrail.length - 1; i >= 0; i--) {
+      ship.nitroTrail[i].opacity -= 0.02;
+      if (ship.nitroTrail[i].opacity <= 0) {
+        ship.nitroTrail.splice(i, 1);
+      }
+    }
+
     if (dx !== 0 || dy !== 0) {
       const len = Math.sqrt(dx * dx + dy * dy);
-      ship.x += (dx / len) * ship.speed;
-      ship.y += (dy / len) * ship.speed;
+      const currentSpeed = ship.isNitroActive ? ship.nitroSpeed : ship.speed;
+      ship.x += (dx / len) * currentSpeed;
+      ship.y += (dy / len) * currentSpeed;
     }
 
     const mx = mouseX - ship.x;
@@ -221,7 +628,7 @@ function spawnAsteroid(source, size, angleOverride = null) {
     ship.angle = Math.atan2(my, mx);
 
     if (shooting) {
-      if (!ship.lastShot || Date.now() - ship.lastShot > 400) {
+      if (!ship.lastShot || Date.now() - ship.lastShot > ship.fireRate) {
         shoot();
         ship.lastShot = Date.now();
       }
@@ -247,10 +654,31 @@ function spawnAsteroid(source, size, angleOverride = null) {
     asteroids.forEach(a => {
       a.x += Math.cos(a.angle) * a.speed;
       a.y += Math.sin(a.angle) * a.speed;
-      if (a.x < 0) a.x = canvas.width;
-      if (a.x > canvas.width) a.x = 0;
-      if (a.y < 0) a.y = canvas.height;
-      if (a.y > canvas.height) a.y = 0;
+      
+      if (asteroidMode === "Teletransporte") {
+        // Modo teletransporte
+        if (a.x < 0) a.x = canvas.width;
+        if (a.x > canvas.width) a.x = 0;
+        if (a.y < 0) a.y = canvas.height;
+        if (a.y > canvas.height) a.y = 0;
+      } else {
+        // Modo ricochete
+        if (a.x - a.size < 0) {
+          a.x = a.size;
+          a.angle = Math.PI - a.angle;
+        } else if (a.x + a.size > canvas.width) {
+          a.x = canvas.width - a.size;
+          a.angle = Math.PI - a.angle;
+        }
+        
+        if (a.y - a.size < 0) {
+          a.y = a.size;
+          a.angle = -a.angle;
+        } else if (a.y + a.size > canvas.height) {
+          a.y = canvas.height - a.size;
+          a.angle = -a.angle;
+        }
+      }
     });
 
     for (let i = asteroids.length - 1; i >= 0; i--) {
@@ -262,21 +690,21 @@ function spawnAsteroid(source, size, angleOverride = null) {
         if (Math.sqrt(dx * dx + dy * dy) < a.size) {
           bullets.splice(j, 1);
           createExplosion(a.x, a.y, a.hue, a.size);
+          money += a.reward;
+          localStorage.setItem("asteroids-money", money);
           if (a.size > 60) {
             const newSize = Math.max(40, a.size / 1.8);
             const splitChance = Math.random();
             let spawnCount = 2;
 
-            if (splitChance > 0.8) spawnCount = 5;
-            else if (splitChance > 0.5) spawnCount = 4;
-            else if (splitChance > 0.3) spawnCount = 3;
+            if (splitChance > 0.98) spawnCount = 3;
+            else if (splitChance > 0.95) spawnCount = 2;
+            else spawnCount = 2;
 
             for (let s = 0; s < spawnCount; s++) {
-              spawnAsteroid(a, newSize, s * (Math.PI * 2 / spawnCount));
+              spawnAsteroid(a, newSize);
             }
           }
-
-
 
           asteroids.splice(i, 1);
           break;
@@ -287,20 +715,67 @@ function spawnAsteroid(source, size, angleOverride = null) {
       const dy2 = a.y - ship.y;
       if (Math.sqrt(dx2 * dx2 + dy2 * dy2) < a.size + ship.radius) {
         gameState = "gameover";
-        showOverlay("Você morreu!", "Tentar novamente");
+        gameOverSound.currentTime = 0;
+        gameOverSound.play();
+        showOverlay("Você morreu!", "Tentar novamente", ' ', ' ');
         return;
-
       }
       if (asteroids.length === 0 && gameState === "playing") {
         gameState = "stagecomplete";
-        showOverlay("Fase completa!", "Próxima fase");
+        
+        // Calcula e adiciona a recompensa imediatamente
+        const reward = calculateStageReward(currentStage);
+        money += reward;
+        localStorage.setItem("asteroids-money", money);
+        
+        // Envia o score para a API se tiver nick e id
+        if (playerNick && playerId) {
+          try {
+            // Primeiro envia o novo score
+            const response = await fetch(`${API_URL}/post-player`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id_custom: playerId,
+                nick: playerNick,
+                score: currentStage + 1
+              })
+            });
+            
+            if (response.ok) {
+              // Depois busca o ranking atualizado
+              const rankingResponse = await fetch(`${API_URL}/get-100-players`);
+              if (rankingResponse.ok) {
+                rankingData = await rankingResponse.json();
+                updateRanking();
+                
+                // Encontra a posição do jogador no ranking
+                const playerRank = rankingData.findIndex(player => player.id_custom === playerId) + 1;
+                
+                showOverlay(
+                  "Fase completa!", 
+                  "Próxima fase",
+                  `Seu rank mundial: ${playerRank}º`,
+                  `Sua premiação: $${reward}`
+                );
+              }
+            }
+          } catch (error) {
+            console.error("Erro ao enviar score:", error);
+            showOverlay("Fase completa!", "Próxima fase");
+          }
+        } else {
+          showOverlay("Fase completa!", "Próxima fase");
+        }
         return;
       }
     }
 
     if (asteroids.length === 0) {
       wave++;
-      createAsteroids(wave + 4);
+      createAsteroids(Math.max(2, wave + 2));
     }
 
     particles.forEach(p => {
@@ -316,46 +791,38 @@ function spawnAsteroid(source, size, angleOverride = null) {
     }
   }
 
-  function drawStars() {
-  const time = Date.now() * 0.001;
-
-  stars.forEach(s => {
-    const x = s.baseX + Math.sin(time * s.moveSpeed + s.offset) * 10;
-    const y = s.baseY + Math.cos(time * s.moveSpeed + s.offset) * 10;
-
-    const pulse = 0.6 + Math.sin(time * s.twinkle) * 0.4;
-    const outerRadius = s.size * 1; // controla quanto o brilho se espalha
-
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, outerRadius);
-    grad.addColorStop(0, `rgba(255, 255, 255, ${pulse})`);
-    grad.addColorStop(0.2, `rgba(255, 255, 255, ${pulse * 0.5})`);
-    grad.addColorStop(1, `rgba(255, 255, 255, 0)`);
-
-    ctx.beginPath();
-    ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-  });
-}
-
-
-
-
-
   function drawShip() {
     ctx.save();
     ctx.translate(ship.x, ship.y);
     ctx.rotate(ship.angle);
+
+    // Desenhar rastro do nitro
+    if (ship.isNitroActive) {
+      for (let i = 0; i < ship.nitroTrail.length; i++) {
+        const trail = ship.nitroTrail[i];
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, trail.size);
+        gradient.addColorStop(0, `rgba(255, 0, 0, ${trail.opacity})`);
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(-trail.distance, 0, trail.size, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+    }
+
+    // Desenhar nave
     const gradient = ctx.createRadialGradient(0, 0, 2, 0, 0, 18);
-    gradient.addColorStop(0, "#00FFFF");
-    gradient.addColorStop(1, "#006666");
+    gradient.addColorStop(0, ship.isNitroActive ? "#FF0000" : "#00FFFF");
+    gradient.addColorStop(1, ship.isNitroActive ? "#660000" : "#006666");
+    
     ctx.beginPath();
     ctx.moveTo(18, 0);
     ctx.lineTo(-12, 10);
     ctx.lineTo(-12, -10);
     ctx.closePath();
     ctx.fillStyle = gradient;
-    ctx.shadowColor = "#00FFFF";
+    ctx.shadowColor = ship.isNitroActive ? "#FF0000" : "#00FFFF";
     ctx.shadowBlur = 30;
     ctx.fill();
     ctx.restore();
@@ -409,10 +876,33 @@ function spawnAsteroid(source, size, angleOverride = null) {
       ctx.globalAlpha = 1;
     });
 
+    // Desenhar barra de nitro por último para ficar por cima de tudo
+    const nitroBarWidth = 200;
+    const nitroBarHeight = 20;
+    const nitroBarX = 20;
+    const nitroBarY = 100; // Aumentado de 90 para 100
+
+    // Fundo da barra
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(nitroBarX, nitroBarY, nitroBarWidth, nitroBarHeight);
+    
+    // Barra de energia
+    const energyWidth = (ship.nitroEnergy / 100) * nitroBarWidth;
+    ctx.fillStyle = ship.isNitroActive ? "#ff0000" : "#00ffff";
+    ctx.fillRect(nitroBarX, nitroBarY, energyWidth, nitroBarHeight);
+    
+    // Borda
+    ctx.strokeStyle = "#00ffff";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(nitroBarX, nitroBarY, nitroBarWidth, nitroBarHeight);
+
+    // Desenhar textos por último também
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "20px Arial";
     ctx.shadowBlur = 0;
-    ctx.fillText("Wave: " + wave, 20, 30);
+    ctx.fillText("Fase: " + currentStage, 20, 30);
+    ctx.fillText("Próxima Recompensa: $" + calculateStageReward(currentStage), 20, 60);
+    ctx.fillText("$" + money, 20, 90);
 
     if (gameState === "gameover") {
       ctx.fillStyle = "white";
@@ -426,10 +916,18 @@ function spawnAsteroid(source, size, angleOverride = null) {
       ctx.fillStyle = "white";
       ctx.font = "50px Arial";
       ctx.fillText("Fase completa!", canvas.width / 2 - 150, canvas.height / 2 - 40);
+      
+      // Encontra a posição do jogador no ranking
+      const playerRank = rankingData.findIndex(player => player.id_custom === playerId) + 1;
+      const reward = calculateStageReward(currentStage);
+      
       ctx.font = "30px Arial";
-      ctx.fillText("Clique para ir para a próxima fase", canvas.width / 2 - 200, canvas.height / 2 + 20);
+      ctx.fillText(`Seu rank mundial: ${playerRank}º`, canvas.width / 2 - 150, canvas.height / 2 + 20);
+      ctx.fillText(`Sua premiação: $${reward}`, canvas.width / 2 - 150, canvas.height / 2 + 60);
+      
+      ctx.font = "30px Arial";
+      ctx.fillText("Clique para ir para a próxima fase", canvas.width / 2 - 200, canvas.height / 2 + 120);
     }
-
   }
 
   function resetStage() {
@@ -439,6 +937,7 @@ function spawnAsteroid(source, size, angleOverride = null) {
   ship.x = canvas.width / 2;
   ship.y = canvas.height / 2;
   ship.angle = 0;
+    ship.nitroEnergy = ship.nitroCapacity; // Recarrega o nitro ao máximo
 }
 
 function retryStage() {
@@ -446,24 +945,183 @@ function retryStage() {
   resetStage();
   createAsteroids(wave + 4);
   gameState = "playing";
+  overlay.style.display = "none";
 }
 
-function nextStage() {
+const API_URL = "https://temnave-api-work.projetobot.workers.dev";
+
+// Lista de nicks aleatórios (todos com 14 caracteres ou menos)
+const randomNicks = [
+  "CosmicExplorer", "StarVoyager", "GalaxyHunter", "SpacePilot", "AstroWarrior",
+  "NebulaRider", "CometChaser", "MeteorMaster", "OrbitGuardian", "SolarKnight",
+  "LunarRanger", "MarsMarauder", "JupiterJumper", "SaturnSlicer", "UranusUnleashed",
+  "NeptuneNinja", "PlutoPilot", "VenusViper", "MercuryMercenary", "EarthEnforcer",
+  "StellarStriker", "CelestialCrusher", "InterstellarInvader", "CosmicCrusader", "SpaceSamurai",
+  "GalacticGladiator", "AstralAssassin", "NewNinja", "QuasarQueen", "PulsarPrince",
+  "BlackHoleBuster", "WhiteDwarfWarrior", "RedGiantRanger", "BlueGiantBlaster", "SupernovaSniper",
+  "DarkMatterMaster", "LightYearLegend", "WarpSpeedWarrior", "HyperspaceHero", "QuantumKnight",
+  "GravityGuardian", "VoidVoyager", "CosmosCrusher", "InfinityInvader", "EternityEnforcer",
+  "DimensionDiver", "RealityRider", "MultiverseMaster", "ParallelPilot", "TimelineTraveler"
+];
+
+// Função para gerar nick aleatório
+function getRandomNick() {
+  return randomNicks[Math.floor(Math.random() * randomNicks.length)];
+}
+
+// Dados do jogador
+let playerNick = localStorage.getItem("playerNick") || getRandomNick();
+let playerId = localStorage.getItem("playerId") || "";
+let rankingData = []; // Inicialmente vazio, será preenchido pela API
+
+// Função para gerar ID único
+function generateUniqueId() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < 32; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+}
+
+// Função para buscar o ranking da API
+async function fetchRanking() {
+  try {
+    const response = await fetch(`${API_URL}/get-100-players`);
+    if (response.ok) {
+      rankingData = await response.json();
+      updateRanking();
+    }
+  } catch (error) {
+    console.error("Erro ao buscar ranking:", error);
+  }
+}
+
+async function saveNick() {
+  const input = document.getElementById("playerNick");
+  playerNick = input.value.trim().substring(0, 14); // Limita a 14 caracteres
+  if (playerNick) {
+    // Gera um novo ID se não existir um
+    if (!playerId) {
+      playerId = generateUniqueId();
+    }
+    localStorage.setItem("playerNick", playerNick);
+    localStorage.setItem("playerId", playerId);
+    
+    // Envia o score inicial para a API
+    try {
+      const response = await fetch(`${API_URL}/post-player`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id_custom: playerId,
+          nick: playerNick,
+          score: 1
+        })
+      });
+      
+      if (response.ok) {
+        alert("Nick salvo com sucesso!");
+        // Busca o ranking atualizado
+        await fetchRanking();
+      } else {
+        alert("Erro ao salvar nick. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar score:", error);
+      alert("Erro ao salvar nick. Tente novamente.");
+    }
+  }
+}
+
+function updateRanking() {
+  const rankingList = document.getElementById("rankingList");
+  rankingList.innerHTML = "";
+  
+  rankingData.forEach((player, index) => {
+    const playerDiv = document.createElement("div");
+    playerDiv.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: ${index % 2 === 0 ? "rgba(0,255,255,0.05)" : "rgba(0,255,255,0.1)"};
+      border-radius: 5px;
+      margin-bottom: 5px;
+    `;
+    
+    playerDiv.innerHTML = `
+      <div style="display: flex; align-items: center;">
+        <span style="color: #00ffff; margin-right: 10px;">${index + 1}º</span>
+        <span>${player.nick}</span>
+      </div>
+      <span style="color: #00ff00;">Nível ${player.score}</span>
+    `;
+    
+    rankingList.appendChild(playerDiv);
+  });
+}
+
+function showOverlay(title, buttonText, subtitle1 = "", subtitle2 = "") {
+  overlayTitle.textContent = title;
+  overlayButton.textContent = buttonText;
+  
+  // Adiciona os subtítulos se forem fornecidos
+  if (subtitle1 || subtitle2) {
+    const subtitleDiv = document.createElement("div");
+    subtitleDiv.style.cssText = `
+      margin-top: 20px;
+      text-align: center;
+      color: #00ffff;
+      font-size: 20px;
+    `;
+    
+    if (subtitle1) {
+      const sub1 = document.createElement("div");
+      sub1.textContent = subtitle1;
+      subtitleDiv.appendChild(sub1);
+    }
+    
+    if (subtitle2) {
+      const sub2 = document.createElement("div");
+      sub2.textContent = subtitle2;
+      subtitleDiv.appendChild(sub2);
+    }
+    
+    // Remove subtítulos anteriores se existirem
+    const oldSubtitles = document.querySelectorAll("#overlay-subtitles");
+    oldSubtitles.forEach(el => el.remove());
+    
+    subtitleDiv.id = "overlay-subtitles";
+    overlayTitle.parentNode.insertBefore(subtitleDiv, overlayButton);
+  }
+  
+  overlay.style.display = "flex";
+  
+  if (title === "Tem Nave") {
+    gameState = "menu";
+  } else if (title === "Você morreu!") {
+    gameState = "gameover";
+  } else if (title === "Fase completa!") {
+    gameState = "stagecomplete";
+  }
+}
+
+async function nextStage() {
   currentStage++;
   localStorage.setItem("asteroids-stage", currentStage);
   wave = currentStage;
   resetStage();
   createAsteroids(wave + 4);
   gameState = "playing";
+  overlay.style.display = "none";
 }
 
-
-
-function showOverlay(title, buttonText) {
-  overlayTitle.textContent = title;
-  overlayButton.textContent = buttonText;
-  overlay.style.display = "flex";
-}
+  function calculateStageReward(stage) {
+    return Math.floor(1000 * Math.pow(1.5, stage - 1)); // Aumenta 50% a cada fase
+  }
 
   function loop() {
     update();
@@ -471,8 +1129,346 @@ function showOverlay(title, buttonText) {
     requestAnimationFrame(loop);
   }
 
+  function upgradeFireRate() {
+    const price = calculateUpgradePrice(upgradePrices.fireRate, upgrades.fireRate);
+    if (money >= price) {
+      money -= price;
+      upgrades.fireRate++;
+      ship.fireRate = Math.max(10, 600 - (upgrades.fireRate - 1) * 55); // Aumentado o impacto
+      localStorage.setItem("asteroids-money", money);
+      localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
+      showShop();
+    }
+  }
+
+  function upgradeBulletSpeed() {
+    const price = calculateUpgradePrice(upgradePrices.bulletSpeed, upgrades.bulletSpeed);
+    if (money >= price) {
+      money -= price;
+      upgrades.bulletSpeed++;
+      ship.bulletSpeed = 12 + (upgrades.bulletSpeed - 1) * 8;
+      localStorage.setItem("asteroids-money", money);
+      localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
+      showShop();
+    }
+  }
+
+  function upgradeBulletSize() {
+    const price = calculateUpgradePrice(upgradePrices.bulletSize, upgrades.bulletSize);
+    if (money >= price) {
+      money -= price;
+      upgrades.bulletSize++;
+      ship.bulletSize = 6 + (upgrades.bulletSize - 1) * 8;
+      localStorage.setItem("asteroids-money", money);
+      localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
+      showShop();
+    }
+  }
+
+  function upgradeNitroRecharge() {
+    const price = calculateUpgradePrice(upgradePrices.nitroRecharge, upgrades.nitroRecharge);
+    if (money >= price) {
+      money -= price;
+      upgrades.nitroRecharge++;
+      ship.nitroRecharge = 0.1 + (upgrades.nitroRecharge - 1) * 0.2;
+      localStorage.setItem("asteroids-money", money);
+      localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
+      showShop();
+    }
+  }
+
+  function upgradeNitroCapacity() {
+    const price = calculateUpgradePrice(upgradePrices.nitroCapacity, upgrades.nitroCapacity);
+    if (money >= price) {
+      money -= price;
+      upgrades.nitroCapacity++;
+      ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 100;
+      ship.nitroEnergy = ship.nitroCapacity;
+      localStorage.setItem("asteroids-money", money);
+      localStorage.setItem("asteroids-upgrades", JSON.stringify(upgrades));
+      showShop();
+    }
+  }
+
+  function loadUpgrades() {
+    const savedUpgrades = JSON.parse(localStorage.getItem("asteroids-upgrades")) || {
+      fireRate: 1,
+      bulletSpeed: 1,
+      bulletSize: 1,
+      nitroRecharge: 1,
+      nitroCapacity: 1
+    };
+    
+    upgrades = savedUpgrades;
+    
+    // Aplicar as melhorias salvas
+    ship.fireRate = Math.max(10, 600 - (upgrades.fireRate - 1) * 55);
+    ship.bulletSpeed = 12 + (upgrades.bulletSpeed - 1) * 8;
+    ship.bulletSize = 6 + (upgrades.bulletSize - 1) * 8;
+    ship.nitroRecharge = 0.1 + (upgrades.nitroRecharge - 1) * 0.2;
+    ship.nitroCapacity = 100 + (upgrades.nitroCapacity - 1) * 100;
+    ship.nitroEnergy = ship.nitroCapacity;
+  }
+
+  // Inicialização do jogo
+  loadUpgrades();
   createAsteroids(wave + 4);
   loop();
+
+  const shopButton = document.getElementById("shop-button");
+  shopButton.addEventListener("click", showShop);
+
+  const shopOverlay = document.createElement("div");
+  shopOverlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 20;
+    font-family: sans-serif;
+  `;
+  document.body.appendChild(shopOverlay);
+
+  function showShop() {
+    gameState = "shop";
+    shopOverlay.innerHTML = `
+      <div style="
+        background: rgba(0,0,0,0.95);
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px solid #00ffff;
+        box-shadow: 0 0 30px rgba(0,255,255,0.3);
+        max-width: 1200px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      ">
+        <button onclick="closeShop()" style="
+          position: absolute;
+          top: -6px;
+          right: 10px;
+          border: none;
+          color: #ff00ff;
+          font-size: 42px;
+          cursor: pointer;
+          padding: 5px;
+          font-weight: 900;
+          background: #000000;
+          border-radius: 100%;
+          line-height: 42px;
+        ">×</button>
+        
+        <div style="
+          background: rgba(0,0,0,0.5);
+          padding: 15px;
+          border-radius: 15px;
+          margin-bottom: 20px;
+          text-align: center;
+          border: 1px solid #00ffff;
+        ">
+          <h2 style="color: #00ffff; margin-bottom: 10px;">Seu Dinheiro</h2>
+          <div style="
+            font-size: 32px;
+            color: #00ff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,255,0,0.5);
+          ">$${money}</div>
+        </div>
+
+        <div style="
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 15px;
+          margin-bottom: 20px;
+        ">
+          <div style="
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ffff;
+            text-align: center;
+          ">
+            <h3 style="color: #00ffff; margin-bottom: 15px;">Cadência de Tiro</h3>
+            <div style="
+              background: rgba(0,255,255,0.1);
+              padding: 15px;
+              border-radius: 10px;
+              margin-bottom: 15px;
+            ">
+              <div style="color: #00ff00; margin-bottom: 5px; font-size: 18px;">Nível ${upgrades.fireRate}</div>
+              <div style="color: #ff00ff; font-size: 16px;">Preço: $${calculateUpgradePrice(upgradePrices.fireRate, upgrades.fireRate)}</div>
+            </div>
+            <button onclick="upgradeFireRate()" style="
+              padding: 12px 24px;
+              background: #006666;
+              color: #00ffff;
+              border: 2px solid #00ffff;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 18px;
+              transition: all 0.3s;
+              width: 100%;
+            ">Comprar</button>
+          </div>
+
+          <div style="
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ffff;
+            text-align: center;
+          ">
+            <h3 style="color: #00ffff; margin-bottom: 15px;">Velocidade do Tiro</h3>
+            <div style="
+              background: rgba(0,255,255,0.1);
+              padding: 15px;
+              border-radius: 10px;
+              margin-bottom: 15px;
+            ">
+              <div style="color: #00ff00; margin-bottom: 5px; font-size: 18px;">Nível ${upgrades.bulletSpeed}</div>
+              <div style="color: #ff00ff; font-size: 16px;">Preço: $${calculateUpgradePrice(upgradePrices.bulletSpeed, upgrades.bulletSpeed)}</div>
+            </div>
+            <button onclick="upgradeBulletSpeed()" style="
+              padding: 12px 24px;
+              background: #006666;
+              color: #00ffff;
+              border: 2px solid #00ffff;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 18px;
+              transition: all 0.3s;
+              width: 100%;
+            ">Comprar</button>
+          </div>
+
+          <div style="
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ffff;
+            text-align: center;
+          ">
+            <h3 style="color: #00ffff; margin-bottom: 15px;">Tamanho do Tiro</h3>
+            <div style="
+              background: rgba(0,255,255,0.1);
+              padding: 15px;
+              border-radius: 10px;
+              margin-bottom: 15px;
+            ">
+              <div style="color: #00ff00; margin-bottom: 5px; font-size: 18px;">Nível ${upgrades.bulletSize}</div>
+              <div style="color: #ff00ff; font-size: 16px;">Preço: $${calculateUpgradePrice(upgradePrices.bulletSize, upgrades.bulletSize)}</div>
+            </div>
+            <button onclick="upgradeBulletSize()" style="
+              padding: 12px 24px;
+              background: #006666;
+              color: #00ffff;
+              border: 2px solid #00ffff;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 18px;
+              transition: all 0.3s;
+              width: 100%;
+            ">Comprar</button>
+          </div>
+
+          <div style="
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ffff;
+            text-align: center;
+          ">
+            <h3 style="color: #00ffff; margin-bottom: 15px;">Recarga do Nitro</h3>
+            <div style="
+              background: rgba(0,255,255,0.1);
+              padding: 15px;
+              border-radius: 10px;
+              margin-bottom: 15px;
+            ">
+              <div style="color: #00ff00; margin-bottom: 5px; font-size: 18px;">Nível ${upgrades.nitroRecharge}</div>
+              <div style="color: #ff00ff; font-size: 16px;">Preço: $${calculateUpgradePrice(upgradePrices.nitroRecharge, upgrades.nitroRecharge)}</div>
+            </div>
+            <button onclick="upgradeNitroRecharge()" style="
+              padding: 12px 24px;
+              background: #006666;
+              color: #00ffff;
+              border: 2px solid #00ffff;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 18px;
+              transition: all 0.3s;
+              width: 100%;
+            ">Comprar</button>
+          </div>
+
+          <div style="
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ffff;
+            text-align: center;
+          ">
+            <h3 style="color: #00ffff; margin-bottom: 15px;">Capacidade do Nitro</h3>
+            <div style="
+              background: rgba(0,255,255,0.1);
+              padding: 15px;
+              border-radius: 10px;
+              margin-bottom: 15px;
+            ">
+              <div style="color: #00ff00; margin-bottom: 5px; font-size: 18px;">Nível ${upgrades.nitroCapacity}</div>
+              <div style="color: #ff00ff; font-size: 16px;">Preço: $${calculateUpgradePrice(upgradePrices.nitroCapacity, upgrades.nitroCapacity)}</div>
+            </div>
+            <button onclick="upgradeNitroCapacity()" style="
+              padding: 12px 24px;
+              background: #006666;
+              color: #00ffff;
+              border: 2px solid #00ffff;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 18px;
+              transition: all 0.3s;
+              width: 100%;
+            ">Comprar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    shopOverlay.style.display = "flex";
+  }
+
+  function closeShop() {
+    shopOverlay.style.display = "none";
+    gameState = "playing"; // Garante que o estado volte para playing
+    overlay.style.display = "none"; // Esconde o overlay para garantir que o jogo continue
+  }
+
+  // Inicializar o ranking quando a página carregar
+  document.addEventListener("DOMContentLoaded", async () => {
+    const nickInput = document.getElementById("playerNick");
+    if (nickInput) {
+      nickInput.value = playerNick;
+    }
+    
+    // Se não tiver ID, gera um novo
+    if (!playerId) {
+      playerId = generateUniqueId();
+      localStorage.setItem("playerId", playerId);
+    }
+    
+    // Busca o ranking inicial
+    await fetchRanking();
+    
+    // Inicialmente mostra a tela inicial
+    showOverlay("Tem Nave", "Jogar");
+  });
 </script>
 </body>
 </html>
