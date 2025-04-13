@@ -932,6 +932,43 @@ function spawnAsteroid(source, size, angleOverride = null) {
           a.y = canvas.height - a.size;
           a.angle = -a.angle;
         }
+
+        // Verificar colisão com outros asteroides
+        asteroids.forEach(other => {
+          if (a !== other) {
+            const dx = other.x - a.x;
+            const dy = other.y - a.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < a.size + other.size) {
+              // Colisão detectada
+              const angle = Math.atan2(dy, dx);
+              const sin = Math.sin(angle);
+              const cos = Math.cos(angle);
+              
+              // Rotacionar velocidades
+              const vx1 = a.speed * Math.cos(a.angle - angle);
+              const vy1 = a.speed * Math.sin(a.angle - angle);
+              const vx2 = other.speed * Math.cos(other.angle - angle);
+              const vy2 = other.speed * Math.sin(other.angle - angle);
+              
+              // Trocar velocidades no eixo x
+              const finalVx1 = vx2;
+              const finalVx2 = vx1;
+              
+              // Rotacionar de volta
+              a.angle = angle + Math.atan2(vy1, finalVx1);
+              other.angle = angle + Math.atan2(vy2, finalVx2);
+              
+              // Ajustar posições para evitar sobreposição
+              const overlap = (a.size + other.size - distance) / 2;
+              a.x -= overlap * cos;
+              a.y -= overlap * sin;
+              other.x += overlap * cos;
+              other.y += overlap * sin;
+            }
+          }
+        });
       }
     });
 
