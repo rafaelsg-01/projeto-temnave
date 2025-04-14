@@ -433,7 +433,9 @@
   }
 
   // Verifica se é um dispositivo móvel
-  const isMobile = () => {
+  let isMobileDevice = false; // Variável global para armazenar o estado
+
+  const detectMobile = () => {
     // Verifica se é um dispositivo móvel baseado no User Agent
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const mobileRegex = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i;
@@ -444,24 +446,26 @@
     // Verifica se é um dispositivo móvel baseado no tamanho da tela
     const isSmallScreen = window.innerWidth <= 768;
     
-    // Verifica se é um dispositivo móvel baseado na orientação
-    const isPortrait = window.innerHeight > window.innerWidth;
-    
-    // Retorna true se qualquer uma das condições for verdadeira
-    return mobileRegex.test(userAgent) || (hasTouch && (isSmallScreen || isPortrait));
-  };
+    // Se for detectado como mobile uma vez, mantém como mobile
+    if (!isMobileDevice) {
+      isMobileDevice = mobileRegex.test(userAgent) || (hasTouch && isSmallScreen);
+    }
 
-  // Inicializa os joysticks se for dispositivo móvel
-  if (isMobile()) {
-    console.log('Dispositivo móvel detectado:', {
+    console.log('Detecção de dispositivo:', {
       userAgent: navigator.userAgent,
       hasTouch: 'ontouchstart' in window,
       maxTouchPoints: navigator.maxTouchPoints,
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
-      isPortrait: window.innerHeight > window.innerWidth
+      isPortrait: window.innerHeight > window.innerWidth,
+      isMobileDevice: isMobileDevice
     });
 
+    return isMobileDevice;
+  };
+
+  // Inicializa os joysticks se for dispositivo móvel
+  if (detectMobile()) {
     const leftJoystick = nipplejs.create({
       zone: document.getElementById('left-joystick'),
       mode: 'static',
@@ -766,7 +770,7 @@ document.addEventListener("mouseleave", () => shooting = false);
   }
 
   function createAsteroids(count) {
-    const adjustedCount = isMobile() ? 
+    const adjustedCount = detectMobile() ? 
       Math.max(1, Math.floor(count * 0.25)) : // Mantém o mobile igual
       Math.max(1, Math.floor(count * 0.5)); // Reduz pela metade no desktop
     for (let i = 0; i < adjustedCount; i++) {
@@ -1808,8 +1812,16 @@ async function nextStage() {
   }
 
   // Adicionar event listeners para mudanças de orientação
-  window.addEventListener('resize', checkOrientation);
-  window.addEventListener('orientationchange', checkOrientation);
+  window.addEventListener('resize', () => {
+    checkOrientation();
+    // Re-detecta mobile após mudança de orientação
+    detectMobile();
+  });
+  window.addEventListener('orientationchange', () => {
+    checkOrientation();
+    // Re-detecta mobile após mudança de orientação
+    detectMobile();
+  });
 
   // Verificar orientação inicial
   checkOrientation();
